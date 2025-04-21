@@ -1,13 +1,11 @@
 "use client"
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import AdminDashboard from "./component/admin/dashboard";
-import DashboardLayout from "./component/layout/dashboardLayout";
-import StatCard from "./component/layout/StatCard";
+
+import DashboardLayout from "../component/layout/dashboardLayout";
+import StatCard from "../component/layout/StatCard";
 import { Package, Percent, Ticket } from "lucide-react";
-import ProjectTable from "./component/layout/ProjectTable";
-import AuthComponent from "./component/SignUp";
-import { ClassNames } from "@emotion/react";
+import ProjectTable from "../component/layout/ProjectTable";
 
 export default function Home() {
   const [isLightMode, setIsLightMode] = useState(false);
@@ -74,8 +72,5 @@ export default function Home() {
 
       <ProjectTable isLightMode={isLightMode} />
     </DashboardLayout>
-  //  <div className="items-center justify-center flex my-36">
-  //    < AuthComponent/>
-  //  </div>
   );
 }
