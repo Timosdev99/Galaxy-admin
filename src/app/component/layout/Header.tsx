@@ -23,7 +23,7 @@ export default function Header({ isLightMode, toggleLightMode, toggleMobileMenu 
           </div>
           <div className="flex items-center gap-2 md:gap-4">
             <ThemeToggle isLightMode={isLightMode} toggleLightMode={toggleLightMode} />
-            {/* <UserProfile />  */}
+             <UserProfile />  
           </div>
         </div>
       </div>

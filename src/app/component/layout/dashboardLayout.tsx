@@ -1,26 +1,14 @@
-
 "use client"
 
 import { useState, useEffect } from 'react';
 import Header from './Header';
 import Sidebar from './Sidebar';
 import MobileSidebar from './MobileSidebar';
-import { useAuth } from '../../context/authcontext';
-import { useRouter } from 'next/navigation';
 
 export default function DashboardLayout({ children }: any) {
   const [isLightMode, setIsLightMode] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   
-  const { user } = useAuth();
-  const router = useRouter();
-
-  useEffect(() => {
-    if (!user) {
-      router.push('/');
-    }
-  }, [user, router]);
-
   useEffect(() => {
     const storedTheme = localStorage.getItem("theme");
     if (storedTheme === "light") {

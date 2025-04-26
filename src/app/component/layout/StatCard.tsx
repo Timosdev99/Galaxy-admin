@@ -11,7 +11,7 @@ export default function StatCard({
   }: any) {
     const getTrendStyles = () => {
       if (trend === 'up') return 'bg-green-50 text-green-600';
-      if (trend === 'down') return 'bg-green-50 text-green-600'; // You might want to use red for down trends
+      if (trend === 'down') return 'bg-green-50 text-green-600'; 
       return 'bg-blue-50 text-blue-600';
     };
   

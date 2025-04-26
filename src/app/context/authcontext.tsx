@@ -47,87 +47,68 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [token, setToken] = useState<string | null>(null);
   const router = useRouter();
   
-  // Initialize auth state from localStorage on component mount
+  // Single authentication check on mount
   useEffect(() => {
-    // Need to use this check for Next.js to prevent localStorage error during SSR
-    if (typeof window !== 'undefined') {
+    const checkAuth = async () => {
+      setIsLoading(true);
       const storedToken = localStorage.getItem('auth_token');
-      if (storedToken) {
-        setToken(storedToken);
-        checkAuth(storedToken);
-      } else {
-        setIsLoading(false);
-      }
-    } else {
-      setIsLoading(false);
-    }
-  }, []);
-  
-  const checkAuth = async (existingToken: string | null) => {
-    setIsLoading(true);
-    
-    if (!existingToken) {
-      setIsAuthenticated(false);
-      setUser(null);
-      setIsLoading(false);
-      return;
-    }
-    
-    try {
-      const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/validate-token', {
-        method: 'GET',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${existingToken}`  
-        },
-      });
       
-      if (response.ok) {
-        const userData = await response.json();
+      if (!storedToken) {
+        setIsAuthenticated(false);
+        setUser(null);
+        setToken(null);
+        setIsLoading(false);
+        return;
+      }
+      
+      try {
+        const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/validate-token', {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${storedToken}`  
+          },
+        });
         
-        if (userData && userData.user) {
-          setUser(userData.user);
-          setIsAuthenticated(true);
+        if (response.ok) {
+          const userData = await response.json();
+          
+          if (userData && userData.user) {
+            setToken(storedToken);
+            setUser(userData.user);
+            setIsAuthenticated(true);
+          } else {
+            handleAuthFailure();
+          }
         } else {
-          console.warn('Valid response but missing user data');
           handleAuthFailure();
         }
-      } else {
-        console.log('Not authenticated:', response.status);
+      } catch (error) {
+        console.error('Auth check error:', error);
         handleAuthFailure();
+      } finally {
+        setIsLoading(false);
       }
-    } catch (error) {
-      console.error('Auth check error:', error);
-      handleAuthFailure();
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    };
+    
+    checkAuth();
+  }, []);
   
   const handleAuthFailure = () => {
     setIsAuthenticated(false);
     setUser(null);
     setToken(null);
-    
-    // Check if we're in a browser environment before using localStorage
-    if (typeof window !== 'undefined') {
-      localStorage.removeItem('auth_token');
-    }
+    localStorage.removeItem('auth_token');
   };
   
   const login = (newToken: string, userData: User) => {
     console.log('Login successful, setting user data and token');
     
     if (newToken && userData) {
-      // Update state
       setToken(newToken);
+      localStorage.setItem('auth_token', newToken);
       setUser(userData);
       setIsAuthenticated(true);
-      
-      // Store token in localStorage
-      if (typeof window !== 'undefined') {
-        localStorage.setItem('auth_token', newToken);
-      }
     } else {
       console.error('Login attempted with invalid token or user data');
     }
@@ -147,7 +128,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
     } catch (error) {
       console.error('Logout error:', error);
     } finally {
-      // Clear auth state no matter what happens with the logout request
       handleAuthFailure();
       router.push('/');
     }

@@ -25,10 +25,10 @@ import {
   
     // Navigation items array
     const navItems = [
-      { icon: BarChart, text: "Dashboard", href: "#", isActive: true },
-      { icon: Package, text: "Orders", href: "#" },
+      { icon: BarChart, text: "Dashboard", href: "/dashboard", isActive: true },
+      { icon: Package, text: "Orders", href: "orders" },
       { icon: Ticket, text: "Tickets", href: "#" },
-      {icon: MessageCircle, text: "Chat", href: "/chat"},
+      {icon: MessageCircle, text: "Chat", href: "/chats"},
       { icon: User, text: "Customers", href: "#" },
       { icon: Settings, text: "Settings", href: "#" },
       

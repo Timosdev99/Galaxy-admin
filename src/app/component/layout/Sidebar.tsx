@@ -13,7 +13,7 @@ import {
   export default function Sidebar({ isLightMode }: any) {
     // Navigation items array to make it more maintainable
     const navItems = [
-        { icon: BarChart, text: "Dashboard", href: "/", isActive: true },
+        { icon: BarChart, text: "Dashboard", href: "/dashboard", isActive: true },
       { icon: Package, text: "Orders", href: "/orders" },
       { icon: Ticket, text: "Tickets", href: "#" },
       {icon: MessageCircle, text: "Chat", href: "/chats"},
