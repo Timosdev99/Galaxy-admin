@@ -1,4 +1,4 @@
-// Create this in a new file, e.g., utils/axiosConfig.js
+
 import axios from 'axios';
 
 const configureAxios = (getToken: () => any) => {
