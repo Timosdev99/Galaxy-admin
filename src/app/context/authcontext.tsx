@@ -45,85 +45,129 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [isClient, setIsClient] = useState(false);
   const router = useRouter();
   
-  // Single authentication check on mount
+  // Set isClient flag once component mounts
   useEffect(() => {
-    const checkAuth = async () => {
-      setIsLoading(true);
-      const storedToken = localStorage.getItem('auth_token');
-      
-      if (!storedToken) {
-        setIsAuthenticated(false);
-        setUser(null);
-        setToken(null);
-        setIsLoading(false);
-        return;
-      }
-      
-      try {
-        const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/validate-token', {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${storedToken}`  
-          },
-        });
-        
-        if (response.ok) {
-          const userData = await response.json();
-          
-          if (userData && userData.user) {
-            setToken(storedToken);
-            setUser(userData.user);
-            setIsAuthenticated(true);
-          } else {
-            handleAuthFailure();
-          }
-        } else {
-          handleAuthFailure();
-        }
-      } catch (error) {
-        console.error('Auth check error:', error);
-        handleAuthFailure();
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
-    checkAuth();
+    setIsClient(true);
   }, []);
   
+  // Load token from localStorage on mount - with better debug
+  useEffect(() => {
+    if (!isClient) return;
+    
+    try {
+      const storedToken = localStorage.getItem('token');
+      console.log('Checking localStorage for token:', !!storedToken);
+      
+      if (storedToken) {
+        console.log('Found token in localStorage, validating...');
+        setToken(storedToken);
+        validateToken(storedToken);
+      } else {
+        console.log('No token found in localStorage');
+        setIsLoading(false);
+      }
+    } catch (error) {
+      console.error('Error accessing localStorage:', error);
+      setIsLoading(false);
+    }
+  }, [isClient]);
+  
+  // Validate token function with better error handling
+  const validateToken = async (tokenToValidate: string) => {
+    console.log('Validating token:', tokenToValidate?.substring(0, 10) + '...');
+    
+    try {
+      const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/validate-token', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${tokenToValidate}`  
+        },
+      });
+      
+      console.log('Token validation response status:', response.status);
+      
+      if (response.ok) {
+        const userData = await response.json();
+        console.log('Token validation succeeded, user data:', userData);
+        
+        if (userData && userData.user) {
+          setUser(userData.user);
+          setIsAuthenticated(true);
+          console.log('User authenticated:', userData.user);
+        } else {
+          console.error('Invalid user data structure:', userData);
+          handleAuthFailure();
+        }
+      } else {
+        const errorText = await response.text();
+        console.error('Token validation failed:', response.status, errorText);
+        handleAuthFailure();
+      }
+    } catch (error) {
+      console.error('Auth check error:', error);
+      handleAuthFailure();
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
   const handleAuthFailure = () => {
+    console.log('Authentication failed, clearing state');
     setIsAuthenticated(false);
     setUser(null);
     setToken(null);
-    localStorage.removeItem('auth_token');
+    
+    try {
+      localStorage.removeItem('token');
+      console.log('Removed token from localStorage');
+    } catch (error) {
+      console.error('Error removing token from localStorage:', error);
+    }
   };
   
   const login = (newToken: string, userData: User) => {
-    console.log('Login successful, setting user data and token');
+    console.log('Login attempt with token and user:', !!newToken, userData);
     
     if (newToken && userData) {
-      setToken(newToken);
-      localStorage.setItem('auth_token', newToken);
-      setUser(userData);
-      setIsAuthenticated(true);
+      // Format the token consistently
+      const formattedToken = newToken.startsWith('Bearer ') ? newToken.substring(7) : newToken;
+      
+      try {
+        // Set in localStorage first to ensure it works
+        localStorage.setItem('token', formattedToken);
+        console.log('Token saved in localStorage');
+        
+        // Then update state
+        setToken(formattedToken);
+        setUser(userData);
+        setIsAuthenticated(true);
+        
+        console.log('Authentication state updated successful');
+      } catch (error) {
+        console.error('Error saving token to localStorage:', error);
+      }
     } else {
       console.error('Login attempted with invalid token or user data');
     }
   };
   
   const logout = async () => {
+    console.log('Logout initiated');
+    
     try {
       if (token) {
-        await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/logout', {
+        const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/logout', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${token}`  
           },
         });
+        console.log('Logout API response:', response.status);
       }
     } catch (error) {
       console.error('Logout error:', error);
@@ -132,6 +176,26 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
       router.push('/');
     }
   };
+  
+  // Event listener for storage changes (for multi-tab support)
+  useEffect(() => {
+    if (!isClient) return;
+    
+    const handleStorageChange = (event: StorageEvent) => {
+      if (event.key === 'token') {
+        console.log('Token changed in another tab/window');
+        if (event.newValue) {
+          setToken(event.newValue);
+          validateToken(event.newValue);
+        } else {
+          handleAuthFailure();
+        }
+      }
+    };
+    
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
+  }, [isClient]);
   
   const value: AuthContextType = {
     isAuthenticated,

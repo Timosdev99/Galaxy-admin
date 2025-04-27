@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import StatusBadge from './StatusBadge';
 
-// Define TypeScript interfaces for the order data
+
 interface OrderItem {
   _id: string;
   productId: string;

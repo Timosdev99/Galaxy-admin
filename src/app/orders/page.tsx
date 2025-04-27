@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import axios from "axios";
 import { useAuth } from "../context/authcontext";
 import DashboardLayout from "../component/layout/dashboardLayout";
+import ProtectedRoute from "../protectedRoutes";
 
 export default function OrdersPage() {
   const [orders, setOrders] = useState([]);
@@ -25,10 +26,10 @@ export default function OrdersPage() {
   
   const fetchOrders = async () => {
     // Don't attempt to fetch if token is missing
-    if (!token) {
-      console.log("Skipping fetch - missing token");
-      return;
-    }
+    // if (!token) {
+    //   console.log("Skipping fetch - missing token");
+    //   return;
+    // }
     
     try {
       setLoading(true);
@@ -43,7 +44,7 @@ export default function OrdersPage() {
       
       const response = await axios.get(url, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       
@@ -64,11 +65,11 @@ export default function OrdersPage() {
   };
 
   // Only fetch orders when token is available
-  useEffect(() => {
-    if (token) {
-      fetchOrders();
-    }
-  }, [token]);
+  // useEffect(() => {
+  //   if (token) {
+  //     fetchOrders();
+  //   }
+  // }, [token]);
 
   const handleFilterChange = (newFilters: SetStateAction<{ status: string; marketplace: string; customerId: string; fromDate: string; toDate: string; minAmount: string; maxAmount: string; }>) => {
     setFilters(newFilters);
@@ -85,7 +86,7 @@ export default function OrdersPage() {
         { orderId, status: newStatus },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -101,10 +102,10 @@ export default function OrdersPage() {
     try {
       await axios.post(
         "https://galaxy-backend-imkz.onrender.com/order/v1/orders/confirm-payment",
-        { orderId, adminId: user?.id },
+        { orderId },
         {
           headers: {
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -117,8 +118,9 @@ export default function OrdersPage() {
   };
 
   return (
-  <DashboardLayout>
-      <div className="p-6">
+ 
+   <DashboardLayout>
+     <div className="p-6">
       <div className="mb-6">
         <h1 className="text-2xl font-bold mb-4">Orders Management</h1>
         <OrderStats />
@@ -138,5 +140,6 @@ export default function OrdersPage() {
       />
     </div>
   </DashboardLayout>
+
   );
 }

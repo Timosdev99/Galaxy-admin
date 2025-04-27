@@ -1,23 +1,39 @@
 
-import Link from 'next/link';
 
-export default function NavItems({ items, isLightMode }: any) {
+import Link from 'next/link';
+import { LucideIcon } from 'lucide-react';
+
+interface NavItemProps {
+  icon: LucideIcon;
+  text: string;
+  href: string;
+  isActive?: boolean;
+}
+
+interface NavItemsProps {
+  items: NavItemProps[];
+  isLightMode: boolean;
+}
+
+const NavItems: React.FC<NavItemsProps> = ({ items, isLightMode }) => {
   return (
     <>
-      {items.map((item: any, index: any) => (
-        <Link 
-          key={index}
+      {items.map((item) => (
+        <Link
+          key={item.text}
           href={item.href}
-          className={`group flex items-center px-4 py-3 text-sm font-medium rounded-md 
-            ${item.isActive 
-              ? 'bg-blue-50 text-blue-700' 
-              : `${isLightMode ? 'text-gray-600' : 'text-gray-300'} hover:bg-gray-700 hover:text-white`
-            }`}
+          className={`flex items-center space-x-2 py-2 px-4 rounded-md transition duration-300 ease-in-out ${
+            item.isActive
+              ? isLightMode ? 'bg-blue-100 text-blue-600 font-semibold' : 'bg-blue-800 text-blue-200 font-semibold'
+              : isLightMode ? 'text-gray-700 hover:bg-gray-100' : 'text-gray-400 hover:bg-slate-800'
+          }`}
         >
-          <item.icon className="mr-3 h-5 w-5" />
-          {item.text}
+          <item.icon className="h-5 w-5" />
+          <span>{item.text}</span>
         </Link>
       ))}
     </>
   );
-}
+};
+
+export default NavItems;

@@ -1,9 +1,9 @@
 "use client";
-import React, { useState } from "react";
-import { X, Send, CheckCircle, User, Mail, Lock, LogIn } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { X, Send, CheckCircle, User, Mail, Lock, LogIn, LogOut } from "lucide-react";
 import { useAuth } from '../context/authcontext';
 import { useRouter } from 'next/navigation';
-import UserProfile from "./userprofile";
+import UserProfile from "../component/userprofile";
 
 interface AuthField {
   name: string;
@@ -132,11 +132,21 @@ const SignupModal = () => {
     setError(null);
   };
 
+  const extractToken = (response: Response): string | null => {
+    const authHeader = response.headers.get('authorization') || response.headers.get('Authorization');
+    if (authHeader) {
+      return authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
+    }
+    return null;
+  };
+
   const signUp = async () => {
     setIsLoading(true);
     setError(null);
     
     try {
+      console.log('Attempting signup with:', { email: formData.email, name: formData.name });
+      
       const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/signUp', {
         method: 'POST',
         headers: {
@@ -149,27 +159,47 @@ const SignupModal = () => {
           role: 'admin'
         }),
       });
-  
+      
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.message || 'Failed to sign up');
       }
   
       const data = await response.json();
+      console.log('Signup successful, received data:', data);
       
-      // Extract token from header
-      let token = null;
-      const authHeader = response.headers.get('authorization') || response.headers.get('Authorization');
-      if (authHeader) {
-        token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
+      // First try to get token from headers
+      let token = extractToken(response);
+      
+      // If not in headers, check if it's in the response body
+      if (!token && data && data.token) {
+        token = data.token;
+      }
+      
+      // If still no token, check common response structures
+      if (!token && data && data.accessToken) {
+        token = data.accessToken;
       }
       
       if (!token) {
+        console.error('No token found in response. Headers or body structure might have changed.');
         throw new Error('No token received from server. Please contact support.');
       }
       
-      if (data && data.user) {
-        authLogin(token, data.user);
+      console.log('Auth token received:', token);
+      
+      // Determine user data structure - handle different API response formats
+      let userData = data.user;
+      if (!userData && data.userData) {
+        userData = data.userData;
+      }
+      
+      if (userData) {
+        // Store token in localStorage immediately
+        localStorage.setItem('token', token);
+        
+        // Update auth context
+        authLogin(token, userData);
         
         setIsSubmitted(true);
         setTimeout(() => {
@@ -192,6 +222,8 @@ const SignupModal = () => {
     setError(null);
     
     try {
+      console.log('Attempting login with:', { email: formData.email });
+      
       const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/login', {
         method: 'POST',
         headers: {
@@ -209,20 +241,40 @@ const SignupModal = () => {
       }
       
       const data = await response.json();
+      console.log('Login successful, received data:', data);
       
-      // Extract token from header
-      let token = null;
-      const authHeader = response.headers.get('authorization') || response.headers.get('Authorization');
-      if (authHeader) {
-        token = authHeader.startsWith('Bearer ') ? authHeader.substring(7) : authHeader;
+      // First try to get token from headers
+      let token = extractToken(response);
+      
+      // If not in headers, check if it's in the response body
+      if (!token && data && data.token) {
+        token = data.token;
+      }
+      
+      // If still no token, check common response structures
+      if (!token && data && data.accessToken) {
+        token = data.accessToken;
       }
       
       if (!token) {
+        console.error('No token found in response. Headers or body structure might have changed.');
         throw new Error('No token received from server. Please contact support.');
       }
       
-      if (data && data.user) {
-        authLogin(token, data.user);
+      console.log('Auth token received:', token);
+      
+      // Determine user data structure - handle different API response formats
+      let userData = data.user;
+      if (!userData && data.userData) {
+        userData = data.userData;
+      }
+      
+      if (userData) {
+        // Store token in localStorage immediately
+        localStorage.setItem('token', token);
+        
+        // Update auth context
+        authLogin(token, userData);
         
         setIsSubmitted(true);
         setTimeout(() => {

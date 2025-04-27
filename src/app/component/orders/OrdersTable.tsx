@@ -63,7 +63,7 @@ export default function OrdersTable({ orders, loading, onStatusUpdate, onPayment
   };
 
   return (
-    <div className="bg-white rounded-lg shadow overflow-hidden">
+    <div className="bg-white rounded-lg shadow overflow-hidden ">
       <div className="overflow-x-auto">
         {loading ? (
           <div className="py-12 text-center">
@@ -135,20 +135,20 @@ export default function OrdersTable({ orders, loading, onStatusUpdate, onPayment
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleViewDetails(order)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-600 hover:text-blue-900 cursor-pointer"
                       >
                         View
                       </button>
                       <button
                         onClick={() => handleUpdate(order)}
-                        className="text-green-600 hover:text-green-900"
+                        className="text-green-600 hover:text-green-900 cursor-pointer"
                       >
                         Update
                       </button>
                       {order.payment.status === "pending" && (
                         <button
                           onClick={() => handleConfirmPayment(order.id)}
-                          className="text-purple-600 hover:text-purple-900"
+                          className="text-purple-600 hover:text-purple-900 cursor-pointer"
                         >
                           Confirm Payment
                         </button>

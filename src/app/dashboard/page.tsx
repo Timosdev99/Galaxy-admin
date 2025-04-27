@@ -28,7 +28,7 @@ export default function Dashboard() {
       
       try {
         setIsLoading(true);
-        const response = await fetch(`https://galaxy-backend-imkz.onrender.com/order/v1/orders/customer/${user.id}`, {
+        const response = await fetch(`https://galaxy-backend-imkz.onrender.com/order/v1/orders'`, {
           headers: {
             'Authorization': `Bearer ${token}`
           }
@@ -56,24 +56,16 @@ export default function Dashboard() {
     }
   }, [token, user]);
 
+  
+
   return (
    <DashboardLayout>
      <div className="container mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 md:mb-8">
         <h2 className={`text-xl sm:text-2xl font-semibold ${isLightMode ? 'text-gray-800' : 'text-white'} mb-3 sm:mb-0`}>Overview</h2>
-        <div>
-          <select 
-            className="bg-gray-200 rounded-lg border border-gray-300 text-black py-2 px-3 sm:py-3 sm:px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500 text-sm"
-            defaultValue="Last 30 days"
-          >
-            <option>Last 7 days</option>
-            <option>Last 30 days</option>
-            <option>Last 90 days</option>
-          </select>
-        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      {/* <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <StatCard 
           title="Open Tickets"
           value="42"
@@ -106,7 +98,7 @@ export default function Dashboard() {
           iconText="Up to 25% on bulk orders"
           isLightMode={isLightMode}
         />
-      </div>
+      </div> */}
 
       <ProjectTable isLightMode={isLightMode} />
     </div>

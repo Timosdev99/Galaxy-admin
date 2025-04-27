@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { formatCurrency } from "../../utils/formatter";
+import { useAuth } from "../../context/authcontext";
 
 // Define types for the analytics data
 interface OrderAnalytics {
@@ -38,9 +39,11 @@ export default function OrderStats() {
     revenueByMarketplace: {}
   });
   const [loading, setLoading] = useState(true);
+  const { token } = useAuth();
 
   useEffect(() => {
     const fetchAnalytics = async () => {
+
       try {
         setLoading(true);
         const response = await axios.get("https://galaxy-backend-imkz.onrender.com/order/v1/orders/analytics", {
@@ -48,7 +51,12 @@ export default function OrderStats() {
             Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
-        setAnalytics(response.data.analytics);
+        
+        if (response.data && response.data.analytics) {
+          setAnalytics(response.data.analytics);
+        } else {
+          console.error("Unexpected response format:", response.data);
+        }
       } catch (error) {
         console.error("Failed to fetch order analytics:", error);
       } finally {
@@ -57,7 +65,7 @@ export default function OrderStats() {
     };
 
     fetchAnalytics();
-  }, []);
+  }, [token]);
 
   const statCards: StatCard[] = [
     {
