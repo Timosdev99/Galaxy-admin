@@ -316,7 +316,7 @@ const SignupModal = () => {
       const token = extractToken(response) || data.data?.token;
       if (!token) throw new Error('No token received from server');
       
-      const userData = data.data?.user;
+      const userData = data?.user;
       if (!userData) throw new Error('User data not found in response');
       
       localStorage.setItem('token', token);
