@@ -169,7 +169,7 @@ const SignupModal = () => {
     setError(null);
   
     try {
-      const response = await fetch('https://api.ghostmarket.net/user/v1/request-admin-otp', {
+      const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/request-admin-otp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -179,6 +179,7 @@ const SignupModal = () => {
       });
   
       const data = await response.json();
+      console.log(data)
   
       if (!response.ok) {
         throw new Error(data.message || 'Failed to request admin OTP');
