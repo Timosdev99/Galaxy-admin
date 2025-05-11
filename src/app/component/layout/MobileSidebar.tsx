@@ -5,6 +5,7 @@ import {
   Ticket,  
   Settings, 
   Home,
+  Store,
   LogOut,
   MessageCircle,
   LucideIcon
@@ -36,6 +37,7 @@ export default function MobileSidebar({ isLightMode }: any) {
      { icon: Package, text: "Order", href: "/orders" },
      { icon: MessageCircle, text: "Chat", href: "/chats" },
      { icon: Ticket, text: "Tickets", href: "#" },
+     {icon: Store, text: "MarketPlace", href: "create"}
    ]);
 
    useEffect(() => {

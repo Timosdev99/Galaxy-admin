@@ -7,6 +7,7 @@ import {
   MessageCircle,
   Home,
   LucideIcon,
+  Store,
 } from 'lucide-react';
 import NavItems from './NavItems';
 import { usePathname } from 'next/navigation';
@@ -26,6 +27,7 @@ export default function Sidebar({ isLightMode }: any) {
     { icon: Package, text: "Orders", href: "/orders" },
     { icon: MessageCircle, text: "Chat", href: "/chats" },
     { icon: Ticket, text: "Tickets", href: "#" },
+    {icon: Store, text: "MarketPlace", href: "create"}
   ]);
 
   useEffect(() => {
