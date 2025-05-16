@@ -34,7 +34,7 @@ interface FormField {
   options?: string[]
 }
 
-const Endpoint = "https://api.ghostmarket.net"
+const Endpoint = "https://galaxy-backend-imkz.onrender.com"
 
 export default function MarketplaceManager() {
   const { token } = useAuth()

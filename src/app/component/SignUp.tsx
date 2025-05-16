@@ -232,7 +232,7 @@ const SignupModal = () => {
       }
 
     
-      const response = await fetch('https://api.ghostmarket.net/user/v1/signUp', {
+      const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/signUp', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -298,7 +298,7 @@ const SignupModal = () => {
     }
 
     try {
-      const response = await fetch('https://api.ghostmarket.net/user/v1/login', {
+      const response = await fetch('https://galaxy-backend-imkz.onrender.com/user/v1/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

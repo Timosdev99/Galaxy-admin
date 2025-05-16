@@ -75,7 +75,7 @@ export default function Dashboard() {
           icon={Ticket}
           iconText="15 high priority"
           isLightMode={isLightMode}
-        />
+        /> 
         
         <StatCard 
           title="Total Orders"
